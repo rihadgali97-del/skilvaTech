@@ -1,0 +1,15 @@
+export const ROUTES = Object.freeze({
+  HOME:             '/',
+  LOGIN:            '/login',
+  REGISTER:         '/register',
+  FORGOT_PASSWORD:  '/forgot-password',
+  DASHBOARD:        '/dashboard',
+  USERS:            '/dashboard/users',
+  ROLES:            '/dashboard/roles',
+  COURSES:          '/dashboard/courses',
+  CLIENTS:          '/dashboard/clients',
+  PROJECTS:         '/dashboard/projects',
+  TICKETS:          '/dashboard/tickets',
+  SETTINGS:         '/dashboard/settings',
+  PROFILE:          '/dashboard/profile',
+});
