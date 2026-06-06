@@ -54,9 +54,17 @@ model User {
   isEmailVerified Boolean  @default(false)
   roleId          String
   role            Role     @relation(fields: [roleId], references: [id])
-  refreshTokens       RefreshToken[]
-  passwordResetTokens PasswordResetToken[]
-  emailVerifyTokens   EmailVerificationToken[]
+
+  refreshTokens        RefreshToken[]
+  passwordResetTokens  PasswordResetToken[]
+  emailVerifyTokens    EmailVerificationToken[]
+  instructorCourses    Course[]     @relation("InstructorCourses")
+  studentEnrollments   Enrollment[] @relation("StudentEnrollments")
+  assignedLeads    Lead[]    @relation("AssignedLeads")
+  managedProjects  Project[] @relation("ManagedProjects")
+  assignedTickets  Ticket[]  @relation("AssignedTickets")
+  createdTickets   Ticket[]  @relation("CreatedTickets")
+
   lastLoginAt     DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -107,40 +115,199 @@ model AuditLog {
 }
 
 model ServiceCategory {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
   description String?
   icon        String?
-  isActive    Boolean  @default(true)
-  order       Int      @default(0)
-
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
   services    Service[]
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   @@map("service_categories")
 }
 
 model Service {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String          @unique
   description String?
   content     String?
   icon        String?
   image       String?
-  price       Decimal? @db.Decimal(10, 2)
-  isActive    Boolean  @default(true)
-  isFeatured  Boolean  @default(false)
-  order       Int      @default(0)
-
+  price       Decimal?        @db.Decimal(10, 2)
+  isActive    Boolean         @default(true)
+  isFeatured  Boolean         @default(false)
+  order       Int             @default(0)
   categoryId  String
   category    ServiceCategory @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  @@map("services")
+}
+
+model Course {
+  id           String       @id @default(cuid())
+  title        String
+  slug         String       @unique
+  description  String?
+  content      String?
+  thumbnail    String?
+  price        Decimal?     @db.Decimal(10, 2)
+  level        String       @default("beginner")
+  isPublished  Boolean      @default(false)
+  isFeatured   Boolean      @default(false)
+  duration     Int?
+  order        Int          @default(0)
+  instructorId String
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  @@map("courses")
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String
+  content     String?
+  videoUrl    String?
+  duration    Int?
+  order       Int      @default(0)
+  isPublished Boolean  @default(false)
+  isFree      Boolean  @default(false)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([courseId, slug])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  status      String    @default("active")
+  progress    Int       @default(0)
+  completedAt DateTime?
+  studentId   String
+  student     User      @relation("StudentEnrollments", fields: [studentId], references: [id])
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+model Client {
+  id          String    @id @default(cuid())
+  name        String
+  email       String    @unique
+  phone       String?
+  company     String?
+  address     String?
+  website     String?
+  notes       String?
+  isActive    Boolean   @default(true)
+
+  projects    Project[]
+  leads       Lead[]
+  invoices    Invoice[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("clients")
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  source      String?  // e.g. website, referral, social
+  status      String   @default("new")  // new, contacted, qualified, lost, converted
+  notes       String?
+  value       Decimal? @db.Decimal(10, 2)
+
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedLeads", fields: [assignedToId], references: [id])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("services")
+  @@map("leads")
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  status      String    @default("planning") // planning, active, on_hold, completed, cancelled
+  priority    String    @default("medium")   // low, medium, high, urgent
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Decimal?  @db.Decimal(10, 2)
+
+  clientId    String?
+  client      Client?   @relation(fields: [clientId], references: [id])
+
+  managerId   String?
+  manager     User?     @relation("ManagedProjects", fields: [managerId], references: [id])
+
+  tickets     Ticket[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("projects")
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("open")    // open, in_progress, resolved, closed
+  priority    String   @default("medium")  // low, medium, high, urgent
+  type        String   @default("support") // support, bug, feature, maintenance
+
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id])
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedTickets", fields: [assignedToId], references: [id])
+
+  createdById  String?
+  createdBy    User?   @relation("CreatedTickets", fields: [createdById], references: [id])
+
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tickets")
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  number      String    @unique
+  status      String    @default("draft") // draft, sent, paid, overdue, cancelled
+  amount      Decimal   @db.Decimal(10, 2)
+  tax         Decimal?  @db.Decimal(10, 2)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  notes       String?
+
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("invoices")
 }

@@ -5,6 +5,12 @@ import roleRoutes            from '../modules/roles/role.routes.js';
 import permissionRoutes      from '../modules/permissions/permission.routes.js';
 import serviceCategoryRoutes from '../modules/service-categories/service-category.routes.js';
 import serviceRoutes         from '../modules/services/service.routes.js';
+import courseRoutes          from '../modules/courses/course.routes.js';
+import enrollmentRoutes      from '../modules/enrollments/enrollment.routes.js';
+import clientRoutes          from '../modules/clients/client.routes.js';
+import leadRoutes            from '../modules/leads/lead.routes.js';
+import projectRoutes         from '../modules/projects/project.routes.js';
+import ticketRoutes          from '../modules/tickets/ticket.routes.js';
 
 const router = Router();
 
@@ -14,5 +20,11 @@ router.use('/roles',              roleRoutes);
 router.use('/permissions',        permissionRoutes);
 router.use('/service-categories', serviceCategoryRoutes);
 router.use('/services',           serviceRoutes);
+router.use('/courses',            courseRoutes);
+router.use('/enrollments',        enrollmentRoutes);
+router.use('/clients',            clientRoutes);
+router.use('/leads',              leadRoutes);
+router.use('/projects',           projectRoutes);
+router.use('/tickets',            ticketRoutes);
 
 export default router;
