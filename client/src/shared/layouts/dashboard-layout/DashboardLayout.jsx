@@ -1,7 +1,9 @@
+import React from 'react';
 import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { usePermissions } from '../../hooks/usePermissions';
+import NotificationBell from '../../../shared/components/ui/NotificationBell';
 
 const navGroups = [
   {
@@ -13,8 +15,9 @@ const navGroups = [
   {
     label: 'Administration',
     items: [
-      { label: 'Users',  path: '/dashboard/users', icon: '👤', permission: 'users:read' },
-      { label: 'Roles',  path: '/dashboard/roles', icon: '🔑', permission: 'roles:read' },
+      { label: 'Users',      path: '/dashboard/users',      icon: '👤', permission: 'users:read' },
+      { label: 'Roles',      path: '/dashboard/roles',      icon: '🔑', permission: 'roles:read' },
+      { label: 'Audit Logs', path: '/dashboard/audit-logs', icon: '📋', permission: 'audit:read' },
     ],
   },
   {
@@ -57,26 +60,19 @@ const DashboardLayout = () => {
         <div className="h-16 flex items-center px-4 border-b border-white/10 flex-shrink-0">
           {open ? (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#00d4d4]/20 border border-[#00d4d4]/40 flex items-center justify-center text-[#00d4d4] font-bold text-sm flex-shrink-0">
-                S
-              </div>
-              <span className="text-lg font-bold text-white tracking-tight">
-                Skilva<span className="text-[#00d4d4]">Tech</span>
-              </span>
+              <div className="w-8 h-8 rounded-lg bg-[#00d4d4]/20 border border-[#00d4d4]/40 flex items-center justify-center text-[#00d4d4] font-bold text-sm flex-shrink-0">S</div>
+              <span className="text-lg font-bold text-white tracking-tight">Skilva<span className="text-[#00d4d4]">Tech</span></span>
             </div>
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-[#00d4d4]/20 border border-[#00d4d4]/40 flex items-center justify-center text-[#00d4d4] font-bold text-sm mx-auto">
-              S
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-[#00d4d4]/20 border border-[#00d4d4]/40 flex items-center justify-center text-[#00d4d4] font-bold text-sm mx-auto">S</div>
           )}
         </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           {navGroups.map((group) => {
-            const visibleItems = group.items.filter((i) => !i.permission || can(i.permission));
-            if (visibleItems.length === 0) return null;
-
+            const visible = group.items.filter((i) => !i.permission || can(i.permission));
+            if (visible.length === 0) return null;
             return (
               <div key={group.label} className="mb-4">
                 {open && (
@@ -84,7 +80,7 @@ const DashboardLayout = () => {
                     {group.label}
                   </p>
                 )}
-                {visibleItems.map((item) => (
+                {visible.map((item) => (
                   <NavLink
                     key={item.path}
                     to={item.path}
@@ -117,16 +113,10 @@ const DashboardLayout = () => {
                 <p className="text-sm font-medium text-white truncate">{user?.firstName} {user?.lastName}</p>
                 <p className="text-xs text-white/40 truncate capitalize">{user?.role?.name}</p>
               </div>
-              <button onClick={logout} title="Logout"
-                className="text-white/40 hover:text-red-400 transition-colors flex-shrink-0 text-sm">
-                ⏻
-              </button>
+              <button onClick={logout} title="Logout" className="text-white/40 hover:text-red-400 transition-colors flex-shrink-0 text-sm">⏻</button>
             </div>
           ) : (
-            <button onClick={logout}
-              className="w-full flex justify-center p-2 text-white/40 hover:text-red-400 transition-colors">
-              ⏻
-            </button>
+            <button onClick={logout} className="w-full flex justify-center p-2 text-white/40 hover:text-red-400 transition-colors">⏻</button>
           )}
         </div>
       </aside>
@@ -136,15 +126,12 @@ const DashboardLayout = () => {
 
         {/* Topbar */}
         <header className="h-16 flex-shrink-0 bg-white border-b border-gray-200 flex items-center px-6 gap-4 shadow-sm">
-          <button onClick={() => setOpen(!open)}
-            className="text-gray-400 hover:text-[#00b3b3] transition-colors text-lg">
-            ☰
-          </button>
+          <button onClick={() => setOpen(!open)} className="text-gray-400 hover:text-[#00b3b3] transition-colors text-lg">☰</button>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 hidden sm:block">
-              {user?.firstName} {user?.lastName}
-            </span>
+            {/* Notification Bell */}
+            <NotificationBell />
+            <span className="text-sm text-gray-500 hidden sm:block">{user?.firstName} {user?.lastName}</span>
             <div className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>

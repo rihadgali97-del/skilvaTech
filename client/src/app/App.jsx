@@ -30,6 +30,9 @@ const LeadsPage             = lazy(() => import('../modules/leads/pages/LeadsPag
 const ProjectsPage          = lazy(() => import('../modules/projects/pages/ProjectsPage'));
 const TicketsPage           = lazy(() => import('../modules/tickets/pages/TicketsPage'));
 
+// Phase 6
+const AuditLogsPage         = lazy(() => import('../modules/auditlogs/pages/AuditLogsPage'));
+
 const wrap = (C) => <Suspense fallback={<PageLoader />}><C /></Suspense>;
 
 const ProtectedRoute = () => {
@@ -47,26 +50,18 @@ const router = createBrowserRouter([
     children: [{
       element: wrap(DashboardLayout),
       children: [
-        // Core
         { path: '/dashboard',                    element: wrap(DashboardPage) },
-
-        // Phase 2
         { path: '/dashboard/users',              element: wrap(UsersPage) },
         { path: '/dashboard/roles',              element: wrap(RolesPage) },
-
-        // Phase 3
         { path: '/dashboard/service-categories', element: wrap(ServiceCategoriesPage) },
         { path: '/dashboard/services',           element: wrap(ServicesPage) },
-
-        // Phase 4
         { path: '/dashboard/courses',            element: wrap(CoursesPage) },
         { path: '/dashboard/enrollments',        element: wrap(EnrollmentsPage) },
-
-        // Phase 5
         { path: '/dashboard/clients',            element: wrap(ClientsPage) },
         { path: '/dashboard/leads',              element: wrap(LeadsPage) },
         { path: '/dashboard/projects',           element: wrap(ProjectsPage) },
         { path: '/dashboard/tickets',            element: wrap(TicketsPage) },
+        { path: '/dashboard/audit-logs',         element: wrap(AuditLogsPage) },
       ],
     }],
   },

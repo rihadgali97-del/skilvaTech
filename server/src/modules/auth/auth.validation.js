@@ -3,10 +3,14 @@ import { z } from 'zod';
 const passwordSchema = z.string().min(8).regex(/[A-Z]/, 'Need uppercase').regex(/[0-9]/, 'Need number');
 
 export const registerSchema = z.object({
-  firstName: z.string().min(2).max(50).trim(),
-  lastName:  z.string().min(2).max(50).trim(),
-  email:     z.string().email().toLowerCase().trim(),
-  password:  passwordSchema,
+  firstName:       z.string().min(2).max(50).trim(),
+  lastName:        z.string().min(2).max(50).trim(),
+  email:           z.string().email().toLowerCase().trim(),
+  password:        passwordSchema,
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"], 
 });
 
 export const loginSchema = z.object({

@@ -11,6 +11,9 @@ import clientRoutes          from '../modules/clients/client.routes.js';
 import leadRoutes            from '../modules/leads/lead.routes.js';
 import projectRoutes         from '../modules/projects/project.routes.js';
 import ticketRoutes          from '../modules/tickets/ticket.routes.js';
+import notificationRoutes    from '../modules/notifications/notification.routes.js';
+import auditLogRoutes        from '../modules/auditlogs/auditlog.routes.js';
+import uploadRoutes          from '../modules/uploads/upload.routes.js';
 
 const router = Router();
 
@@ -26,5 +29,8 @@ router.use('/clients',            clientRoutes);
 router.use('/leads',              leadRoutes);
 router.use('/projects',           projectRoutes);
 router.use('/tickets',            ticketRoutes);
+router.use('/notifications',      notificationRoutes);
+router.use('/audit-logs',         auditLogRoutes);
+router.use('/uploads',            uploadRoutes);
 
 export default router;

@@ -6,7 +6,7 @@ export const generateSlug = (text) =>
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-export const formatCurrency = (amount, currency = 'USD') =>
+export const formatCurrency = (amount, currency = 'ETB') =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
 
 export const formatDate = (date) =>

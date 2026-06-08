@@ -8,10 +8,15 @@ const sanitizeUser = (user) => { const { password, ...safe } = user; return safe
 const buildTokenPayload = (user) => ({ id: user.id, email: user.email, role: user.role?.name });
 const refreshExpiry = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-export const register = async ({ firstName, lastName, email, password }) => {
+// Updated signature to take and verify confirmPassword
+export const register = async ({ firstName, lastName, email, password, confirmPassword }) => {
+  if (password !== confirmPassword) throw new BadRequestError('Passwords do not match');
+  
   if (await authRepo.findUserByEmail(email)) throw new ConflictError('Email already registered');
+  
   const defaultRole = await authRepo.findDefaultRole();
   if (!defaultRole) throw new Error('Default role not configured. Run seed first.');
+  
   const user = await authRepo.createUser({ firstName, lastName, email, password: await hashPassword(password), roleId: defaultRole.id });
   const tokens = generateTokenPair(buildTokenPayload(user));
   await authRepo.saveRefreshToken(user.id, tokens.refreshToken, refreshExpiry());
