@@ -2,16 +2,15 @@ import nodemailer from 'nodemailer';
 import { env } from '../../config/env.js';
 import logger from '../../config/logger.js';
 
-// ─── Create transporter ───────────────────────────────────────────────────────
 const createTransporter = () => {
   if (!env.SMTP_HOST) {
-    logger.warn('SMTP not configured — emails will not be sent');
+    logger.warn('SMTP not configured - emails will not be sent');
     return null;
   }
 
-  return nodemailer.createTransporter({
-    host:   env.SMTP_HOST,
-    port:   env.SMTP_PORT || 587,
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT || 587,
     secure: env.SMTP_PORT === 465,
     auth: {
       user: env.SMTP_USER,
@@ -20,18 +19,21 @@ const createTransporter = () => {
   });
 };
 
-// ─── Send email ───────────────────────────────────────────────────────────────
 export const sendEmail = async ({ to, subject, html, text }) => {
   const transporter = createTransporter();
+
   if (!transporter) {
     logger.info(`[EMAIL SKIPPED] To: ${to} | Subject: ${subject}`);
-    return;
+    return null;
   }
 
   try {
     const info = await transporter.sendMail({
-      from:    `"SkilVaTech" <${env.FROM_EMAIL || 'noreply@skilvatech.com'}>`,
-      to, subject, html, text,
+      from: `"SkilVaTech" <${env.FROM_EMAIL}>`,
+      to,
+      subject,
+      html,
+      text,
     });
     logger.info(`Email sent: ${info.messageId} to ${to}`);
     return info;
@@ -41,10 +43,9 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   }
 };
 
-// ─── Email templates ──────────────────────────────────────────────────────────
 export const sendWelcomeEmail = (user) =>
   sendEmail({
-    to:      user.email,
+    to: user.email,
     subject: 'Welcome to SkilVaTech!',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -62,7 +63,7 @@ export const sendWelcomeEmail = (user) =>
           </a>
         </div>
         <div style="padding: 16px; text-align: center; color: #888; font-size: 12px;">
-          © ${new Date().getFullYear()} SkilVaTech. All rights reserved.
+          &copy; ${new Date().getFullYear()} SkilVaTech. All rights reserved.
         </div>
       </div>
     `,
@@ -70,8 +71,8 @@ export const sendWelcomeEmail = (user) =>
 
 export const sendPasswordResetEmail = (user, resetToken) =>
   sendEmail({
-    to:      user.email,
-    subject: 'Reset Your Password — SkilVaTech',
+    to: user.email,
+    subject: 'Reset Your Password - SkilVaTech',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #0d1f2d; padding: 32px; text-align: center;">
@@ -95,9 +96,10 @@ export const sendPasswordResetEmail = (user, resetToken) =>
   });
 
 export const sendTicketCreatedEmail = (ticket, assignee) => {
-  if (!assignee?.email) return;
+  if (!assignee?.email) return null;
+
   return sendEmail({
-    to:      assignee.email,
+    to: assignee.email,
     subject: `New Ticket Assigned: ${ticket.title}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

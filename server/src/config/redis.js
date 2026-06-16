@@ -11,9 +11,15 @@ export const connectRedis = async () => {
   return redisClient;
 };
 
+export const disconnectRedis = async () => {
+  if (!redisClient) return;
+  await redisClient.quit();
+  redisClient = null;
+};
+
 export const getRedis = () => {
   if (!redisClient) throw new Error('Redis not connected');
   return redisClient;
 };
 
-export default { connectRedis, getRedis };
+export default { connectRedis, disconnectRedis, getRedis };

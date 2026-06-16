@@ -21,6 +21,10 @@ export const listEnrollments = async (query = {}) => {
   return { data, total, page, limit };
 };
 
+export const listStudentEnrollments = async (studentId, query = {}) => {
+  return listEnrollments({ ...query, studentId });
+};
+
 export const enrollStudent = async ({ studentId, courseId }) => {
   // Verify course exists and is published
   const course = await findCourseById(courseId);
@@ -38,6 +42,10 @@ export const enrollStudent = async ({ studentId, courseId }) => {
   return enrollmentRepo.createEnrollment({ studentId, courseId });
 };
 
+export const enrollCurrentStudent = async (studentId, { courseId }) => {
+  return enrollStudent({ studentId, courseId });
+};
+
 export const updateProgress = async (id, { progress, status }) => {
   const enrollment = await enrollmentRepo.findEnrollmentById(id);
   if (!enrollment) throw new NotFoundError('Enrollment');
@@ -51,6 +59,14 @@ export const updateProgress = async (id, { progress, status }) => {
   if (status) data.status = status;
 
   return enrollmentRepo.updateEnrollment(id, data);
+};
+
+export const updateStudentProgress = async (studentId, id, { progress }) => {
+  const enrollment = await enrollmentRepo.findEnrollmentById(id);
+  if (!enrollment) throw new NotFoundError('Enrollment');
+  if (enrollment.studentId !== studentId) throw new NotFoundError('Enrollment');
+
+  return updateProgress(id, { progress });
 };
 
 export const cancelEnrollment = async (id) => {

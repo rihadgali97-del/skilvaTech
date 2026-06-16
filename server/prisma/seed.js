@@ -27,14 +27,14 @@ async function main() {
 
   const superAdminRole = await prisma.role.upsert({
     where: { name: ROLES.SUPER_ADMIN },
-    create: { name: ROLES.SUPER_ADMIN, description: 'Full system access', isSystem: true },
-    update: {},
+    create: { name: ROLES.SUPER_ADMIN, description: 'Full system access', isSystem: true, isDefault: false },
+    update: { isDefault: false, isSystem: true },
   });
 
   const adminRole = await prisma.role.upsert({
     where: { name: ROLES.ADMIN },
-    create: { name: ROLES.ADMIN, description: 'Platform administrator', isSystem: true },
-    update: {},
+    create: { name: ROLES.ADMIN, description: 'Platform administrator', isSystem: true, isDefault: false },
+    update: { isDefault: false, isSystem: true },
   });
 
   const studentRole = await prisma.role.upsert({
@@ -45,19 +45,19 @@ async function main() {
       isSystem: true,
       isDefault: true,   // Assigned on public registration
     },
-    update: {},
+    update: { isDefault: true, isSystem: true },
   });
 
   const instructorRole = await prisma.role.upsert({
     where: { name: ROLES.INSTRUCTOR },
-    create: { name: ROLES.INSTRUCTOR, description: 'Course instructor', isSystem: true },
-    update: {},
+    create: { name: ROLES.INSTRUCTOR, description: 'Course instructor', isSystem: true, isDefault: false },
+    update: { isDefault: false, isSystem: true },
   });
 
   const clientRole = await prisma.role.upsert({
     where: { name: ROLES.CLIENT },
-    create: { name: ROLES.CLIENT, description: 'Business client', isSystem: true },
-    update: {},
+    create: { name: ROLES.CLIENT, description: 'Business client', isSystem: true, isDefault: false },
+    update: { isDefault: false, isSystem: true },
   });
 
   console.log('  ✅ Roles created');
