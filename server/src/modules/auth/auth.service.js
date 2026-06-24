@@ -8,7 +8,6 @@ const sanitizeUser = (user) => { const { password, ...safe } = user; return safe
 const buildTokenPayload = (user) => ({ id: user.id, email: user.email, role: user.role?.name });
 const refreshExpiry = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-// Updated signature to take and verify confirmPassword
 export const register = async ({ firstName, lastName, email, password, confirmPassword }) => {
   if (password !== confirmPassword) throw new BadRequestError('Passwords do not match');
   
@@ -36,7 +35,13 @@ export const refreshTokens = async (refreshToken) => {
   verifyRefreshToken(refreshToken);
   const stored = await authRepo.findRefreshToken(refreshToken);
   if (!stored || stored.expiresAt < new Date()) throw new UnauthorizedError('Refresh token invalid');
+  
   const fullUser = await authRepo.findUserById(stored.user.id);
+  
+  // ─── FIXED: INVALIDATE OLD REFRESH TOKEN ───────────────────────────────────
+  // Clears the database record of the used refresh token before creating a new one
+  await authRepo.deleteRefreshToken(fullUser.id);
+  
   const tokens = generateTokenPair(buildTokenPayload(fullUser));
   await authRepo.saveRefreshToken(fullUser.id, tokens.refreshToken, refreshExpiry());
   return { tokens };

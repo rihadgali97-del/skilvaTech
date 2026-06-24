@@ -14,6 +14,7 @@ import ticketRoutes          from '../modules/tickets/ticket.routes.js';
 import notificationRoutes    from '../modules/notifications/notification.routes.js';
 import auditLogRoutes        from '../modules/auditlogs/auditlog.routes.js';
 import uploadRoutes          from '../modules/uploads/upload.routes.js';
+import exportRoutes          from '../modules/exports/export.routes.js';
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use('/tickets',            ticketRoutes);
 router.use('/notifications',      notificationRoutes);
 router.use('/audit-logs',         auditLogRoutes);
 router.use('/uploads',            uploadRoutes);
+router.use('/exports',            exportRoutes);
 
 export default router;

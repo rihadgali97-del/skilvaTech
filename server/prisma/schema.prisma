@@ -8,28 +8,31 @@ datasource db {
 }
 
 model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String           @id @default(cuid())
+  name        String           @unique
   description String?
-  isDefault   Boolean  @default(false)
-  isSystem    Boolean  @default(false)
+  isDefault   Boolean          @default(false)
+  isSystem    Boolean          @default(false)
   users       User[]
   permissions RolePermission[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   @@map("roles")
 }
 
 model Permission {
-  id          String  @id @default(cuid())
-  name        String  @unique
+  id          String           @id @default(cuid())
+  name        String           @unique
   description String?
   resource    String
   action      String
   roles       RolePermission[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   @@map("permissions")
+  @@index([resource]) // For resource-based permission checks
 }
 
 model RolePermission {
@@ -38,37 +41,40 @@ model RolePermission {
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
+
   @@id([roleId, permissionId])
   @@map("role_permissions")
+  @@index([permissionId]) // Composite primary key covers roleId lookup, but we need an index for permissionId lookups
 }
 
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
+  id              String                   @id @default(cuid())
+  email           String                   @unique
   password        String
   firstName       String
   lastName        String
   avatar          String?
   phone           String?
-  isActive        Boolean  @default(true)
-  isEmailVerified Boolean  @default(false)
+  isActive        Boolean                  @default(true)
+  isEmailVerified Boolean                  @default(false)
   roleId          String
-  role            Role     @relation(fields: [roleId], references: [id])
-
-  refreshTokens        RefreshToken[]
-  passwordResetTokens  PasswordResetToken[]
-  emailVerifyTokens    EmailVerificationToken[]
-  instructorCourses    Course[]     @relation("InstructorCourses")
-  studentEnrollments   Enrollment[] @relation("StudentEnrollments")
-  assignedLeads    Lead[]    @relation("AssignedLeads")
-  managedProjects  Project[] @relation("ManagedProjects")
-  assignedTickets  Ticket[]  @relation("AssignedTickets")
-  createdTickets   Ticket[]  @relation("CreatedTickets")
-  notifications Notification[] @relation("UserNotifications")
+  role            Role                     @relation(fields: [roleId], references: [id])
+  refreshTokens   RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerifyTokens EmailVerificationToken[]
+  instructorCourses Course[]               @relation("InstructorCourses")
+  studentEnrollments Enrollment[]          @relation("StudentEnrollments")
+  assignedLeads   Lead[]                   @relation("AssignedLeads")
+  managedProjects Project[]                @relation("ManagedProjects")
+  assignedTickets Ticket[]                 @relation("AssignedTickets")
+  createdTickets  Ticket[]                 @relation("CreatedTickets")
+  notifications   Notification[]           @relation("UserNotifications")
   lastLoginAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
   @@map("users")
+  @@index([roleId]) // Speeds up relations and grouping users by role
 }
 
 model RefreshToken {
@@ -78,6 +84,7 @@ model RefreshToken {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
   @@map("refresh_tokens")
 }
 
@@ -88,6 +95,7 @@ model PasswordResetToken {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
   @@map("password_reset_tokens")
 }
 
@@ -98,6 +106,7 @@ model EmailVerificationToken {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
   @@map("email_verification_tokens")
 }
 
@@ -111,7 +120,10 @@ model AuditLog {
   ipAddress  String?
   userAgent  String?
   createdAt  DateTime @default(now())
+
   @@map("audit_logs")
+  @@index([userId]) // Essential for fetching action history for a single user
+  @@index([createdAt]) // High probability of sorting or filtering by date ranges
 }
 
 model ServiceCategory {
@@ -125,6 +137,7 @@ model ServiceCategory {
   services    Service[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
   @@map("service_categories")
 }
 
@@ -144,7 +157,9 @@ model Service {
   category    ServiceCategory @relation(fields: [categoryId], references: [id])
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+
   @@map("services")
+  @@index([categoryId]) // Speeds up loading services under a specific category
 }
 
 model Course {
@@ -166,7 +181,9 @@ model Course {
   enrollments  Enrollment[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+
   @@map("courses")
+  @@index([instructorId]) // Speeds up loading dashboard data for an instructor
 }
 
 model Lesson {
@@ -183,8 +200,10 @@ model Lesson {
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
   @@unique([courseId, slug])
   @@map("lessons")
+  // Note: The @@unique configuration automatically creates an index matching [courseId, slug] 
 }
 
 model Enrollment {
@@ -198,133 +217,131 @@ model Enrollment {
   course      Course    @relation(fields: [courseId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
   @@unique([studentId, courseId])
   @@map("enrollments")
+  @@index([courseId]) // Unique constraint implicitly indexes studentId first. We need an explicit index for reverse lookup (finding all students in a course)
 }
+
 model Client {
-  id          String    @id @default(cuid())
-  name        String
-  email       String    @unique
-  phone       String?
-  company     String?
-  address     String?
-  website     String?
-  notes       String?
-  isActive    Boolean   @default(true)
-
-  projects    Project[]
-  leads       Lead[]
-  invoices    Invoice[]
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  company   String?
+  address   String?
+  website   String?
+  notes     String?
+  isActive  Boolean   @default(true)
+  projects  Project[]
+  leads     Lead[]
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("clients")
 }
 
 model Lead {
-  id          String   @id @default(cuid())
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  source      String?  // e.g. website, referral, social
-  status      String   @default("new")  // new, contacted, qualified, lost, converted
-  notes       String?
-  value       Decimal? @db.Decimal(10, 2)
-
-  clientId    String?
-  client      Client?  @relation(fields: [clientId], references: [id])
-
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  company      String?
+  source       String?
+  status       String   @default("new")
+  notes        String?
+  value        Decimal? @db.Decimal(10, 2)
+  clientId     String?
+  client       Client?  @relation(fields: [clientId], references: [id])
   assignedToId String?
-  assignedTo   User?   @relation("AssignedLeads", fields: [assignedToId], references: [id])
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assignedTo   User?    @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("leads")
+  @@index([clientId])
+  @@index([assignedToId])
+  @@index([status]) // CRM funnels slice and dice records by pipeline status heavily
 }
 
 model Project {
   id          String    @id @default(cuid())
   name        String
   description String?
-  status      String    @default("planning") // planning, active, on_hold, completed, cancelled
-  priority    String    @default("medium")   // low, medium, high, urgent
+  status      String    @default("planning")
+  priority    String    @default("medium")
   startDate   DateTime?
   endDate     DateTime?
   budget      Decimal?  @db.Decimal(10, 2)
-
   clientId    String?
   client      Client?   @relation(fields: [clientId], references: [id])
-
   managerId   String?
   manager     User?     @relation("ManagedProjects", fields: [managerId], references: [id])
-
   tickets     Ticket[]
-
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@map("projects")
+  @@index([clientId])
+  @@index([managerId])
+  @@index([status])
 }
 
 model Ticket {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  status      String   @default("open")    // open, in_progress, resolved, closed
-  priority    String   @default("medium")  // low, medium, high, urgent
-  type        String   @default("support") // support, bug, feature, maintenance
-
-  projectId   String?
-  project     Project? @relation(fields: [projectId], references: [id])
-
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  status       String    @default("open")
+  priority     String    @default("medium")
+  type         String    @default("support")
+  projectId    String?
+  project      Project?  @relation(fields: [projectId], references: [id])
   assignedToId String?
-  assignedTo   User?   @relation("AssignedTickets", fields: [assignedToId], references: [id])
-
+  assignedTo   User?     @relation("AssignedTickets", fields: [assignedToId], references: [id])
   createdById  String?
-  createdBy    User?   @relation("CreatedTickets", fields: [createdById], references: [id])
-
-  resolvedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdBy    User?     @relation("CreatedTickets", fields: [createdById], references: [id])
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@map("tickets")
+  @@index([projectId])
+  @@index([assignedToId])
+  @@index([status]) // Critical for filtering Kanban boards / issues by state
 }
 
 model Invoice {
-  id          String    @id @default(cuid())
-  number      String    @unique
-  status      String    @default("draft") // draft, sent, paid, overdue, cancelled
-  amount      Decimal   @db.Decimal(10, 2)
-  tax         Decimal?  @db.Decimal(10, 2)
-  dueDate     DateTime?
-  paidAt      DateTime?
-  notes       String?
-
-  clientId    String
-  client      Client    @relation(fields: [clientId], references: [id])
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  number    String    @unique
+  status    String    @default("draft")
+  amount    Decimal   @db.Decimal(10, 2)
+  tax       Decimal?  @db.Decimal(10, 2)
+  dueDate   DateTime?
+  paidAt    DateTime?
+  notes     String?
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("invoices")
+  @@index([clientId])
+  @@index([status])
 }
 
 model Notification {
   id        String   @id @default(cuid())
   title     String
   message   String
-  type      String   @default("info") // info, success, warning, error
+  type      String   @default("info")
   isRead    Boolean  @default(false)
   link      String?
-
   userId    String
   user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("notifications")
+  @@index([userId, isRead]) // Composite index: highly efficient for fetching "unread notifications for a specific user"
 }

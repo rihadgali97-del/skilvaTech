@@ -1,9 +1,20 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto'; // 1. Import crypto to generate unique identifiers
 import { env } from '../../config/env.js';
 import { UnauthorizedError } from '../errors/AppError.js';
 
-export const generateAccessToken  = (payload) => jwt.sign(payload, env.JWT_ACCESS_SECRET,  { expiresIn: env.JWT_ACCESS_EXPIRES,  issuer: 'skilvatech' });
-export const generateRefreshToken = (payload) => jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: env.JWT_REFRESH_EXPIRES, issuer: 'skilvatech' });
+// 2. Spread the payload and add a unique 'jti' property to guarantee token string uniqueness
+export const generateAccessToken  = (payload) => jwt.sign(
+  { ...payload, jti: crypto.randomUUID() }, 
+  env.JWT_ACCESS_SECRET, 
+  { expiresIn: env.JWT_ACCESS_EXPIRES, issuer: 'skilvatech' }
+);
+
+export const generateRefreshToken = (payload) => jwt.sign(
+  { ...payload, jti: crypto.randomUUID() }, 
+  env.JWT_REFRESH_SECRET, 
+  { expiresIn: env.JWT_REFRESH_EXPIRES, issuer: 'skilvatech' }
+);
 
 export const verifyAccessToken  = (token) => jwt.verify(token, env.JWT_ACCESS_SECRET);
 export const verifyRefreshToken = (token) => {
