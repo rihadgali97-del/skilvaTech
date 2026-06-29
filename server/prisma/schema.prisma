@@ -345,3 +345,18 @@ model Notification {
   @@map("notifications")
   @@index([userId, isRead]) // Composite index: highly efficient for fetching "unread notifications for a specific user"
 }
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  group       String
+  type        String   @default("string")
+  label       String
+  description String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+  @@map("settings")
+}

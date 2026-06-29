@@ -15,6 +15,9 @@ import notificationRoutes    from '../modules/notifications/notification.routes.
 import auditLogRoutes        from '../modules/auditlogs/auditlog.routes.js';
 import uploadRoutes          from '../modules/uploads/upload.routes.js';
 import exportRoutes          from '../modules/exports/export.routes.js';
+import dashboardRoutes       from '../modules/dashboard/dashboard.routes.js';
+import searchRoutes          from '../modules/search/search.routes.js';
+import settingsRoutes        from '../modules/settings/settings.routes.js';
 
 const router = Router();
 
@@ -34,5 +37,8 @@ router.use('/notifications',      notificationRoutes);
 router.use('/audit-logs',         auditLogRoutes);
 router.use('/uploads',            uploadRoutes);
 router.use('/exports',            exportRoutes);
+router.use('/dashboard',          dashboardRoutes);
+router.use('/search',             searchRoutes);
+router.use('/settings',           settingsRoutes);
 
 export default router;
