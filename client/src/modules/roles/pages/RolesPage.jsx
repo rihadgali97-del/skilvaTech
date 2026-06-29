@@ -6,6 +6,7 @@ import Modal from '../../../shared/components/ui/Modal';
 import { Badge, Button, FormField, Input, ConfirmDialog } from '../../../shared/components/ui/index';
 
 // ─── Permission selector (grouped by resource) ────────────────────────────────
+// Defined at module scope — stable identity, safe to take props and re-render.
 const PermissionSelector = ({ grouped, selected, onChange }) => {
   const toggle = (id) => {
     onChange(
@@ -29,13 +30,13 @@ const PermissionSelector = ({ grouped, selected, onChange }) => {
         const allSelected = ids.every((id) => selected.includes(id));
 
         return (
-          <div key={resource} className="bg-slate-800/50 rounded-xl p-4">
+          <div key={resource} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-white capitalize">{resource}</span>
+              <span className="text-sm font-semibold text-gray-900 capitalize">{resource}</span>
               <button
                 type="button"
                 onClick={() => toggleGroup(permissions)}
-                className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                className="text-xs text-[#00b3b3] hover:text-[#008080] transition-colors"
               >
                 {allSelected ? 'Deselect all' : 'Select all'}
               </button>
@@ -48,8 +49,8 @@ const PermissionSelector = ({ grouped, selected, onChange }) => {
                   onClick={() => toggle(perm.id)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all
                     ${selected.includes(perm.id)
-                      ? 'bg-violet-600/30 border-violet-500/50 text-violet-300'
-                      : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:border-slate-500'
+                      ? 'bg-[#00d4d4]/10 border-[#00d4d4]/40 text-[#008080]'
+                      : 'bg-white border-gray-300 text-gray-500 hover:border-gray-400'
                     }`}
                 >
                   {perm.action}
@@ -129,8 +130,8 @@ const RolesPage = () => {
       label: 'Role',
       render: (row) => (
         <div>
-          <p className="font-medium text-white capitalize">{row.name}</p>
-          {row.description && <p className="text-xs text-slate-500 mt-0.5">{row.description}</p>}
+          <p className="font-medium text-gray-900 capitalize">{row.name}</p>
+          {row.description && <p className="text-xs text-gray-500 mt-0.5">{row.description}</p>}
         </div>
       ),
     },
@@ -140,9 +141,9 @@ const RolesPage = () => {
       render: (row) => (
         <div className="flex flex-wrap gap-1 max-w-sm">
           {row.permissions.length === 0
-            ? <span className="text-slate-500 text-xs">No permissions</span>
+            ? <span className="text-gray-400 text-xs">No permissions</span>
             : row.permissions.slice(0, 4).map((p) => (
-                <Badge key={p.id} color="violet">{p.name}</Badge>
+                <Badge key={p.id} color="teal">{p.name}</Badge>
               ))
           }
           {row.permissions.length > 4 && (
@@ -189,14 +190,14 @@ const RolesPage = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Roles</h1>
-          <p className="text-slate-400 text-sm mt-1">{roles.length} roles configured</p>
+          <h1 className="text-2xl font-bold text-gray-900">Roles</h1>
+          <p className="text-gray-500 text-sm mt-1">{roles.length} roles configured</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>+ New Role</Button>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+        <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
       )}
 
       <Table columns={columns} data={roles} loading={loading} emptyMessage="No roles found" />
@@ -205,7 +206,7 @@ const RolesPage = () => {
       <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)} title="Create Role">
         <form onSubmit={handleCreateRole} className="space-y-4">
           {formError && (
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{formError}</div>
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{formError}</div>
           )}
           <FormField label="Role Name" required>
             <Input
@@ -221,7 +222,7 @@ const RolesPage = () => {
               placeholder="Optional description"
             />
           </FormField>
-          <div className="flex gap-3 justify-end pt-2">
+          <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
             <Button variant="secondary" type="button" onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button type="submit" loading={submitting}>Create Role</Button>
           </div>
@@ -240,8 +241,8 @@ const RolesPage = () => {
           selected={selectedPerms}
           onChange={setSelectedPerms}
         />
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-800">
-          <span className="text-sm text-slate-400">{selectedPerms.length} permissions selected</span>
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+          <span className="text-sm text-gray-500">{selectedPerms.length} permissions selected</span>
           <div className="flex gap-3">
             <Button variant="secondary" onClick={() => setPermTarget(null)}>Cancel</Button>
             <Button onClick={handleSavePermissions} loading={submitting}>Save Permissions</Button>

@@ -1,9 +1,10 @@
-import React from 'react';
 import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { usePermissions } from '../../hooks/usePermissions';
 import NotificationBell from '../../../shared/components/ui/NotificationBell';
+import GlobalSearch from '../../../shared/components/ui/GlobalSearch';
+import { withOnboarding } from '../../../shared/components/ui/OnboardingModal';
 
 const navGroups = [
   {
@@ -126,11 +127,18 @@ const DashboardLayout = () => {
 
         {/* Topbar */}
         <header className="h-16 flex-shrink-0 bg-white border-b border-gray-200 flex items-center px-6 gap-4 shadow-sm">
-          <button onClick={() => setOpen(!open)} className="text-gray-400 hover:text-[#00b3b3] transition-colors text-lg">☰</button>
-          <div className="flex-1" />
+          <button onClick={() => setOpen(!open)} className="text-gray-400 hover:text-[#00b3b3] transition-colors text-lg">
+            ☰
+          </button>
+
+          {/* Global search */}
+          <div className="flex-1">
+            <GlobalSearch />
+          </div>
+
           <div className="flex items-center gap-3">
-            {/* Notification Bell */}
             <NotificationBell />
+            <div className="w-px h-6 bg-gray-200" />
             <span className="text-sm text-gray-500 hidden sm:block">{user?.firstName} {user?.lastName}</span>
             <div className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -147,4 +155,5 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+// Wrap with onboarding — shows first-run modal once then never again
+export default withOnboarding(DashboardLayout);

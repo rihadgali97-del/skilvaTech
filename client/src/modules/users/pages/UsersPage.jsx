@@ -19,11 +19,11 @@ const UsersPage = () => {
   const { roles } = useRoles();
 
   // Modal state
-  const [createOpen, setCreateOpen]   = useState(false);
-  const [editUser, setEditUser]       = useState(null);
+  const [createOpen, setCreateOpen]     = useState(false);
+  const [editUser, setEditUser]         = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [submitting, setSubmitting]   = useState(false);
-  const [deleting, setDeleting]       = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [deleting, setDeleting]         = useState(false);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleCreate = async (formData) => {
@@ -62,12 +62,12 @@ const UsersPage = () => {
       label: 'User',
       render: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-violet-600/30 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300 flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#00d4d4]/10 border border-[#00d4d4]/20 flex items-center justify-center text-xs font-bold text-[#00b3b3] flex-shrink-0">
             {row.firstName[0]}{row.lastName[0]}
           </div>
           <div>
-            <p className="font-medium text-white">{row.firstName} {row.lastName}</p>
-            <p className="text-xs text-slate-500">{row.email}</p>
+            <p className="font-medium text-gray-900">{row.firstName} {row.lastName}</p>
+            <p className="text-xs text-gray-500">{row.email}</p>
           </div>
         </div>
       ),
@@ -76,7 +76,7 @@ const UsersPage = () => {
       key: 'role',
       label: 'Role',
       render: (row) => (
-        <Badge color="violet">{row.role?.name || '—'}</Badge>
+        <Badge color="teal">{row.role?.name || '—'}</Badge>
       ),
     },
     {
@@ -92,7 +92,7 @@ const UsersPage = () => {
       key: 'createdAt',
       label: 'Joined',
       render: (row) => (
-        <span className="text-slate-400 text-xs">
+        <span className="text-gray-400 text-xs">
           {new Date(row.createdAt).toLocaleDateString()}
         </span>
       ),
@@ -125,8 +125,8 @@ const UsersPage = () => {
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+          <p className="text-gray-500 text-sm mt-1">
             {pagination.total} total users
           </p>
         </div>
@@ -146,7 +146,7 @@ const UsersPage = () => {
 
       {/* ── Error ──────────────────────────────────────────────────────────── */}
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
           {error}
         </div>
       )}

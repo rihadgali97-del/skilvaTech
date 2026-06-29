@@ -3,6 +3,7 @@ import { useClients } from '../hooks/useClients';
 import Table from '../../../shared/components/ui/Table';
 import Pagination from '../../../shared/components/ui/Pagination';
 import Modal from '../../../shared/components/ui/Modal';
+import { useExport } from '../../../shared/hooks/useExport';
 import { Badge, Button, SearchInput, FormField, Input, ConfirmDialog } from '../../../shared/components/ui/index';
 
 const emptyForm = { name: '', email: '', phone: '', company: '', address: '', website: '', notes: '' };
@@ -21,6 +22,7 @@ const ClientsPage = () => {
   const [deleting, setDeleting]         = useState(false);
   const [formError, setFormError]       = useState('');
   const [form, setForm]                 = useState(emptyForm);
+  const { exportCSV, exporting }        = useExport('/exports/clients', 'clients');
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
@@ -110,6 +112,11 @@ const ClientsPage = () => {
           <p className="text-gray-500 text-sm mt-1">{pagination.total} total clients</p>
         </div>
         <Button onClick={() => { setForm(emptyForm); setCreateOpen(true); }}>+ New Client</Button>
+        <div className="flex gap-2">
+  <Button variant="secondary" onClick={exportCSV} loading={exporting}>
+    ↓ Export CSV
+  </Button>
+</div>
       </div>
 
       <div className="mb-4 max-w-sm">

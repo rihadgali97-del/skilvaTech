@@ -3,6 +3,7 @@ import { useLeads } from '../hooks/useLeads';
 import Table from '../../../shared/components/ui/Table';
 import Pagination from '../../../shared/components/ui/Pagination';
 import Modal from '../../../shared/components/ui/Modal';
+import { useExport } from '../../../shared/hooks/useExport';
 import { Badge, Button, SearchInput, Select, FormField, Input, ConfirmDialog } from '../../../shared/components/ui/index';
 
 const statusColors = { new: 'blue', contacted: 'yellow', qualified: 'teal', lost: 'red', converted: 'green' };
@@ -24,7 +25,7 @@ const LeadsPage = () => {
   const [deleting, setDeleting]         = useState(false);
   const [formError, setFormError]       = useState('');
   const [form, setForm]                 = useState(emptyForm);
-
+  const { exportCSV, exporting } = useExport('/exports/leads', 'leads');
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const handleOpenEdit = (lead) => {
@@ -98,6 +99,9 @@ const LeadsPage = () => {
           <p className="text-gray-500 text-sm mt-1">{pagination.total} total leads</p>
         </div>
         <Button onClick={() => { setForm(emptyForm); setCreateOpen(true); }}>+ New Lead</Button>
+         <Button variant="secondary" onClick={exportCSV} loading={exporting}>
+        ↓ Export CSV
+        </Button>
       </div>
 
       <div className="flex gap-3 mb-4">
