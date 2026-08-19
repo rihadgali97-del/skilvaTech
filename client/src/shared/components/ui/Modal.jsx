@@ -22,7 +22,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
             ✕
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-6 overflow-y-auto max-h-[75vh]">{children}</div>
       </div>
     </div>
   );

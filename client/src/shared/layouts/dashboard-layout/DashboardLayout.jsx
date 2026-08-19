@@ -42,6 +42,7 @@ const navGroups = [
       { label: 'Leads',    path: '/dashboard/leads',    icon: '📊', permission: 'clients:read' },
       { label: 'Projects', path: '/dashboard/projects', icon: '📁', permission: 'projects:read' },
       { label: 'Tickets',  path: '/dashboard/tickets',  icon: '🎫', permission: 'tickets:read' },
+      { label: 'Invoices', path: '/dashboard/invoices', icon: '🧾', permission: 'invoices:read' },
     ],
   },
 ];

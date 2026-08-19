@@ -34,6 +34,7 @@ const ProjectsPage            = lazy(() => import('../modules/projects/pages/Pro
 const TicketsPage             = lazy(() => import('../modules/tickets/pages/TicketsPage'));
 const AuditLogsPage           = lazy(() => import('../modules/auditlogs/pages/AuditLogsPage'));
 const SettingsPage            = lazy(() => import('../modules/settings/pages/SettingsPage'));
+const InvoicesPage = lazy(() => import('../modules/invoices/pages/InvoicesPage'));
 
 const wrap = (C) => <Suspense fallback={<PageLoader />}><C /></Suspense>;
 
@@ -81,6 +82,7 @@ const router = createBrowserRouter([
         { path: '/dashboard/tickets',            element: wrap(TicketsPage) },
         { path: '/dashboard/audit-logs',         element: wrap(AuditLogsPage) },
         { path: '/dashboard/settings',           element: wrap(SettingsPage) },
+        { path: '/dashboard/invoices',           element: wrap(InvoicesPage) },
       ],
     }],
   },
