@@ -38,6 +38,11 @@ export const PERMISSIONS = Object.freeze({
   CLIENTS_UPDATE: 'clients:update',
   CLIENTS_DELETE: 'clients:delete',
 
+  INVOICES_READ:   'invoices:read',
+  INVOICES_CREATE: 'invoices:create',
+  INVOICES_UPDATE: 'invoices:update',
+  INVOICES_DELETE: 'invoices:delete',
+
   ANALYTICS_READ:  'analytics:read',
   SETTINGS_READ:   'settings:read',
   SETTINGS_UPDATE: 'settings:update',

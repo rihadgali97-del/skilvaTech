@@ -312,22 +312,43 @@ model Ticket {
 }
 
 model Invoice {
-  id        String    @id @default(cuid())
-  number    String    @unique
-  status    String    @default("draft")
-  amount    Decimal   @db.Decimal(10, 2)
-  tax       Decimal?  @db.Decimal(10, 2)
-  dueDate   DateTime?
-  paidAt    DateTime?
-  notes     String?
-  clientId  String
-  client    Client    @relation(fields: [clientId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String        @id @default(cuid())
+  number      String        @unique
+  status      String        @default("draft")
+  subtotal    Decimal       @db.Decimal(10, 2)
+  tax         Decimal?      @db.Decimal(10, 2)
+  amount      Decimal       @db.Decimal(10, 2)
+  currency    String        @default("USD")
+  issuedAt    DateTime      @default(now())
+  dueDate     DateTime?
+  paidAt      DateTime?
+  notes       String?
+  terms       String?
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  items       InvoiceItem[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  @@map("invoices")
-  @@index([clientId])
   @@index([status])
+  @@index([clientId])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  total       Decimal  @db.Decimal(10, 2)
+  order       Int      @default(0)
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([invoiceId])
+  @@map("invoice_items")
 }
 
 model Notification {
