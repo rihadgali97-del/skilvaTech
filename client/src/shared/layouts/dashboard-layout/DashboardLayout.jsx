@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { usePermissions } from '../../hooks/usePermissions';
 import NotificationBell from '../../../shared/components/ui/NotificationBell';
@@ -10,22 +10,25 @@ const navGroups = [
   {
     label: 'General',
     items: [
-      { label: 'Dashboard', path: '/dashboard', icon: '▦', permission: null },
+      { label: 'Dashboard',  path: '/dashboard',           icon: '▦',  permission: null },
+      { label: 'Analytics',  path: '/dashboard/analytics', icon: '📊', permission: 'analytics:read' },
     ],
   },
   {
     label: 'Administration',
     items: [
+      { label: 'My Profile', path: '/dashboard/profile',    icon: '👤', permission: null },
       { label: 'Users',      path: '/dashboard/users',      icon: '👤', permission: 'users:read' },
       { label: 'Roles',      path: '/dashboard/roles',      icon: '🔑', permission: 'roles:read' },
       { label: 'Audit Logs', path: '/dashboard/audit-logs', icon: '📋', permission: 'audit:read' },
+      { label: 'Settings',   path: '/dashboard/settings',   icon: '⚙️', permission: 'settings:read' },
     ],
   },
   {
     label: 'Services',
     items: [
       { label: 'Categories', path: '/dashboard/service-categories', icon: '📂', permission: 'services:read' },
-      { label: 'Services',   path: '/dashboard/services',           icon: '⚙️', permission: 'services:read' },
+      { label: 'Services',   path: '/dashboard/services',           icon: '🔧', permission: 'services:read' },
     ],
   },
   {
@@ -39,7 +42,7 @@ const navGroups = [
     label: 'CRM',
     items: [
       { label: 'Clients',  path: '/dashboard/clients',  icon: '🏢', permission: 'clients:read' },
-      { label: 'Leads',    path: '/dashboard/leads',    icon: '📊', permission: 'clients:read' },
+      { label: 'Leads',    path: '/dashboard/leads',    icon: '📈', permission: 'clients:read' },
       { label: 'Projects', path: '/dashboard/projects', icon: '📁', permission: 'projects:read' },
       { label: 'Tickets',  path: '/dashboard/tickets',  icon: '🎫', permission: 'tickets:read' },
       { label: 'Invoices', path: '/dashboard/invoices', icon: '🧾', permission: 'invoices:read' },
@@ -51,6 +54,8 @@ const DashboardLayout = () => {
   const [open, setOpen] = useState(true);
   const { user, logout } = useAuth();
   const { can } = usePermissions();
+
+  const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`;
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -104,21 +109,33 @@ const DashboardLayout = () => {
           })}
         </nav>
 
-        {/* User */}
+        {/* User — clickable avatar links to profile */}
         <div className="p-3 border-t border-white/10 flex-shrink-0">
           {open ? (
             <div className="flex items-center gap-3 p-2">
-              <div className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </div>
+              <Link to="/dashboard/profile"
+                className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white flex-shrink-0 hover:ring-2 hover:ring-[#00d4d4]/60 transition-all">
+                {user?.avatar
+                  ? <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                  : initials
+                }
+              </Link>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user?.firstName} {user?.lastName}</p>
+                <Link to="/dashboard/profile" className="text-sm font-medium text-white truncate hover:text-[#00d4d4] transition-colors block">
+                  {user?.firstName} {user?.lastName}
+                </Link>
                 <p className="text-xs text-white/40 truncate capitalize">{user?.role?.name}</p>
               </div>
               <button onClick={logout} title="Logout" className="text-white/40 hover:text-red-400 transition-colors flex-shrink-0 text-sm">⏻</button>
             </div>
           ) : (
-            <button onClick={logout} className="w-full flex justify-center p-2 text-white/40 hover:text-red-400 transition-colors">⏻</button>
+            <div className="flex flex-col items-center gap-2">
+              <Link to="/dashboard/profile"
+                className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white hover:ring-2 hover:ring-[#00d4d4]/60 transition-all">
+                {initials}
+              </Link>
+              <button onClick={logout} className="text-white/40 hover:text-red-400 transition-colors text-sm">⏻</button>
+            </div>
           )}
         </div>
       </aside>
@@ -140,10 +157,25 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-3">
             <NotificationBell />
             <div className="w-px h-6 bg-gray-200" />
+            <NavLink to="/dashboard/settings"
+              className={({ isActive }) =>
+                `w-8 h-8 flex items-center justify-center rounded-xl transition-colors text-sm
+                 ${isActive ? 'bg-[#00d4d4]/10 text-[#008080]' : 'text-gray-400 hover:text-[#00b3b3] hover:bg-gray-100'}`
+              }
+              title="Settings">
+              ⚙️
+            </NavLink>
+            <div className="w-px h-6 bg-gray-200" />
             <span className="text-sm text-gray-500 hidden sm:block">{user?.firstName} {user?.lastName}</span>
-            <div className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
-            </div>
+            {/* Clickable avatar → profile page */}
+            <Link to="/dashboard/profile"
+              className="w-8 h-8 rounded-full bg-[#00d4d4] flex items-center justify-center text-xs font-bold text-white hover:ring-2 hover:ring-[#00d4d4]/40 transition-all overflow-hidden"
+              title="My Profile">
+              {user?.avatar
+                ? <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                : initials
+              }
+            </Link>
           </div>
         </header>
 
@@ -156,5 +188,4 @@ const DashboardLayout = () => {
   );
 };
 
-// Wrap with onboarding — shows first-run modal once then never again
 export default withOnboarding(DashboardLayout);
