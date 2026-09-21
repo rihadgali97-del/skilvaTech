@@ -20,6 +20,7 @@ import searchRoutes          from '../modules/search/search.routes.js';
 import settingsRoutes        from '../modules/settings/settings.routes.js';
 import invoiceRoutes         from '../modules/invoices/invoice.routes.js';
 import analyticsRoutes       from '../modules/analytics/analytics.routes.js';
+import profileRoutes         from '../modules/profile/profile.routes.js';
 
 const router = Router();
 
@@ -44,5 +45,6 @@ router.use('/search',             searchRoutes);
 router.use('/settings',           settingsRoutes);
 router.use('/invoices',           invoiceRoutes);
 router.use('/analytics',          analyticsRoutes);
+router.use('/profile',            profileRoutes);
 
 export default router;
