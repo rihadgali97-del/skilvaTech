@@ -12,30 +12,33 @@ const CoursesPage    = lazy(() => import('../public/pages/CoursesPage'));
 const PricingPage    = lazy(() => import('../public/pages/PricingPage'));
 const ContactPage    = lazy(() => import('../public/pages/ContactPage'));
 const FAQPage        = lazy(() => import('../public/pages/FAQPage'));
-const ProfilePage    = lazy(() => import('../modules/profile/pages/ProfilePage'));
+
 // ── Dashboard shell ────────────────────────────────────────────────────────────
 const DashboardLayout = lazy(() => import('../shared/layouts/dashboard-layout/DashboardLayout'));
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-const LoginPage    = lazy(() => import('../modules/auth/pages/LoginPage'));
-const RegisterPage = lazy(() => import('../modules/auth/pages/RegisterPage'));
+const LoginPage          = lazy(() => import('../modules/auth/pages/LoginPage'));
+const RegisterPage       = lazy(() => import('../modules/auth/pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../modules/auth/pages/ForgotPasswordPage'));
+const ResetPasswordPage  = lazy(() => import('../modules/auth/pages/ResetPasswordPage'));
 
 // ── Dashboard pages ───────────────────────────────────────────────────────────
 const DashboardPage          = lazy(() => import('../modules/dashboard/pages/DashboardPage'));
-const UsersPage               = lazy(() => import('../modules/users/pages/UsersPage'));
-const RolesPage               = lazy(() => import('../modules/roles/pages/RolesPage'));
-const ServiceCategoriesAdmin  = lazy(() => import('../modules/service-categories/pages/ServiceCategoriesPage'));
-const ServicesAdminPage       = lazy(() => import('../modules/services/pages/ServicesPage'));
-const CoursesAdminPage        = lazy(() => import('../modules/courses/pages/CoursesPage'));
-const EnrollmentsPage         = lazy(() => import('../modules/enrollments/pages/EnrollmentsPage'));
-const ClientsPage             = lazy(() => import('../modules/clients/pages/ClientsPage'));
-const LeadsPage               = lazy(() => import('../modules/leads/pages/LeadsPage'));
-const ProjectsPage            = lazy(() => import('../modules/projects/pages/ProjectsPage'));
-const TicketsPage             = lazy(() => import('../modules/tickets/pages/TicketsPage'));
-const AuditLogsPage           = lazy(() => import('../modules/auditlogs/pages/AuditLogsPage'));
-const SettingsPage            = lazy(() => import('../modules/settings/pages/SettingsPage'));
-const InvoicesPage            =lazy(() => import('../modules/invoices/pages/InvoicesPage'));
-const AnalyticsPage           = lazy(() => import('../modules/analytics/pages/AnalyticsPage'));
+const UsersPage              = lazy(() => import('../modules/users/pages/UsersPage'));
+const RolesPage              = lazy(() => import('../modules/roles/pages/RolesPage'));
+const ServiceCategoriesAdmin = lazy(() => import('../modules/service-categories/pages/ServiceCategoriesPage'));
+const ServicesAdminPage      = lazy(() => import('../modules/services/pages/ServicesPage'));
+const CoursesAdminPage       = lazy(() => import('../modules/courses/pages/CoursesPage'));
+const EnrollmentsPage        = lazy(() => import('../modules/enrollments/pages/EnrollmentsPage'));
+const ClientsPage            = lazy(() => import('../modules/clients/pages/ClientsPage'));
+const LeadsPage              = lazy(() => import('../modules/leads/pages/LeadsPage'));
+const ProjectsPage           = lazy(() => import('../modules/projects/pages/ProjectsPage'));
+const TicketsPage            = lazy(() => import('../modules/tickets/pages/TicketsPage'));
+const AuditLogsPage          = lazy(() => import('../modules/auditlogs/pages/AuditLogsPage'));
+const SettingsPage           = lazy(() => import('../modules/settings/pages/SettingsPage'));
+const InvoicesPage           = lazy(() => import('../modules/invoices/pages/InvoicesPage'));
+const AnalyticsPage          = lazy(() => import('../modules/analytics/pages/AnalyticsPage'));
+const ProfilePage            = lazy(() => import('../modules/profile/pages/ProfilePage'));
 
 const wrap = (C) => <Suspense fallback={<PageLoader />}><C /></Suspense>;
 
@@ -61,8 +64,10 @@ const router = createBrowserRouter([
   },
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
-  { path: '/login',    element: wrap(LoginPage) },
-  { path: '/register', element: wrap(RegisterPage) },
+  { path: '/login',            element: wrap(LoginPage) },
+  { path: '/register',         element: wrap(RegisterPage) },
+  { path: '/forgot-password',  element: wrap(ForgotPasswordPage) },
+  { path: '/reset-password',   element: wrap(ResetPasswordPage) },
 
   // ── Protected dashboard ───────────────────────────────────────────────────────
   {
@@ -71,6 +76,7 @@ const router = createBrowserRouter([
       element: wrap(DashboardLayout),
       children: [
         { path: '/dashboard',                    element: wrap(DashboardPage) },
+        { path: '/dashboard/analytics',          element: wrap(AnalyticsPage) },
         { path: '/dashboard/users',              element: wrap(UsersPage) },
         { path: '/dashboard/roles',              element: wrap(RolesPage) },
         { path: '/dashboard/service-categories', element: wrap(ServiceCategoriesAdmin) },
@@ -84,7 +90,6 @@ const router = createBrowserRouter([
         { path: '/dashboard/audit-logs',         element: wrap(AuditLogsPage) },
         { path: '/dashboard/settings',           element: wrap(SettingsPage) },
         { path: '/dashboard/invoices',           element: wrap(InvoicesPage) },
-        { path: '/dashboard/analytics',          element: wrap(AnalyticsPage) },
         { path: '/dashboard/profile',            element: wrap(ProfilePage) },
       ],
     }],
